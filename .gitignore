@@ -15,5 +15,6 @@
 # vendor/
 
 # Custom
+research-report
 .idea/
 .vscode/

@@ -20,21 +20,23 @@ const (
 )
 
 func main() {
-	t := time.Now()
-	qType := flag.String("query-type", "0", "研报类型，0：个股研报，1：行业研报，2：宏观研究")
-	beginTime := flag.String("begin-time", t.AddDate(0, -1, 0).Format("2006-01-02"), "开始时间")
-	endTime := flag.String("end-time", t.Format("2006-01-02"), "结束时间")
-	minPages := flag.Int("min-pages", 20, "研报最小页数")
-	downloadPath := flag.String("download-path", "/tmp/", "下载路径")
+	now := time.Now().Format("2006-01-02")
+	qType := flag.String("query-type", "0,1,2", "研报类型，0：个股研报，1：行业研报，2：宏观研究")
+	beginTime := flag.String("begin-time", now, "开始时间")
+	endTime := flag.String("end-time", now, "结束时间")
+	minPages := flag.Int("min-pages", 15, "最小页数")
+	downloadPath := flag.String("download-path", "/tmp", "下载路径")
 	flag.Parse()
 
-	items, err := list(*qType, *beginTime, *endTime, *minPages)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	for _, qt := range strings.Split(*qType, ",") {
+		items, err := list(qt, *beginTime, *endTime, *minPages)
+		if err != nil {
+			log.Fatalln(err)
+		}
 
-	if err = download(*qType, *downloadPath, items); err != nil {
-		log.Fatalln(err)
+		if err = download(qt, *downloadPath, items); err != nil {
+			log.Fatalln(err)
+		}
 	}
 }
 
@@ -53,7 +55,7 @@ func list(qType, beginTime, endTime string, minPages int) ([]*Report, error) {
 	curPage, maxPage := 0, 1
 	reports := make([]*Report, 0)
 
-	for curPage != maxPage {
+	for curPage <= maxPage {
 		q.Del("pageNo")
 		q.Add("pageNo", strconv.Itoa(curPage+1))
 		u.RawQuery = q.Encode()
@@ -89,22 +91,21 @@ func list(qType, beginTime, endTime string, minPages int) ([]*Report, error) {
 
 func download(qType, downloadPath string, reports []*Report) error {
 	downloadPath = strings.TrimSuffix(downloadPath, "/")
-	for _, i := range reports {
-		i.PublishDate = fixDate(i.PublishDate)
-		i.Title = fixTitle(i.Title)
-		u := genDownloadURL(i.InfoCode)
-		name := ""
-		dir := ""
+	for _, report := range reports {
+		report.PublishDate = fixDate(report.PublishDate)
+		report.Title = fixTitle(report.Title)
+		u := genDownloadURL(report.InfoCode)
+		dir, name := "", ""
 		switch qType {
 		case "0":
-			name = fmt.Sprintf("%s-%s-%s-%s.pdf", i.StockName, i.PublishDate, i.OrgSName, i.Title)
-			dir = fmt.Sprintf("%s/研报/%s/个股研报/%s/", downloadPath, i.PublishDate[:4], i.IndvInduName)
+			name = fmt.Sprintf("%s-%s-%s-%s.pdf", report.StockName, report.PublishDate, report.OrgSName, report.Title)
+			dir = fmt.Sprintf("%s/研报/%s/个股研报/%s/", downloadPath, report.PublishDate[:4], report.IndvInduName)
 		case "1":
-			name = fmt.Sprintf("%s-%s-%s.pdf", i.PublishDate, i.OrgSName, i.Title)
-			dir = fmt.Sprintf("%s/研报/%s/行业研报/%s/", downloadPath, i.PublishDate[:4], i.IndustryName)
+			name = fmt.Sprintf("%s-%s-%s.pdf", report.PublishDate, report.OrgSName, report.Title)
+			dir = fmt.Sprintf("%s/研报/%s/行业研报/%s/", downloadPath, report.PublishDate[:4], report.IndustryName)
 		case "2":
-			name = fmt.Sprintf("%s-%s-%s.pdf", i.PublishDate, i.OrgSName, i.Title)
-			dir = fmt.Sprintf("%s/研报/%s/宏观研究/", downloadPath, i.PublishDate[:4])
+			name = fmt.Sprintf("%s-%s-%s.pdf", report.PublishDate, report.OrgSName, report.Title)
+			dir = fmt.Sprintf("%s/研报/%s/宏观研究/", downloadPath, report.PublishDate[:4])
 		}
 
 		if _, err := os.Stat(dir); os.IsNotExist(err) {
@@ -133,7 +134,6 @@ func download(qType, downloadPath string, reports []*Report) error {
 }
 
 func fixTitle(title string) string {
-	title = strings.ReplaceAll(title, "/", "")
 	title = strings.ReplaceAll(title, "/", "")
 	title = strings.ReplaceAll(title, "|", "；")
 	return title
