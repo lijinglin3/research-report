@@ -13,7 +13,7 @@ import (
 
 const dataURL = "http://reportapi.eastmoney.com/report/list"
 
-func list(qType, beginTime, endTime string, minPages int) ([]*Report, error) {
+func list(qType, beginTime, endTime string, minPages int) ([]*report, error) {
 	u, err := url.Parse(dataURL)
 	if err != nil {
 		return nil, err
@@ -26,7 +26,7 @@ func list(qType, beginTime, endTime string, minPages int) ([]*Report, error) {
 	q.Add("endTime", endTime)
 
 	curPage, maxPage := 0, 1
-	reports := make([]*Report, 0)
+	rs := make([]*report, 0)
 
 	for curPage <= maxPage {
 		q.Del("pageNo")
@@ -44,7 +44,7 @@ func list(qType, beginTime, endTime string, minPages int) ([]*Report, error) {
 		if err != nil {
 			return nil, err
 		}
-		tmp := new(Reports)
+		tmp := new(reports)
 		if err := json.Unmarshal(body, &tmp); err != nil {
 			return nil, err
 		}
@@ -56,14 +56,14 @@ func list(qType, beginTime, endTime string, minPages int) ([]*Report, error) {
 				continue
 			}
 			i.fill(qType)
-			reports = append(reports, i)
+			rs = append(rs, i)
 		}
 	}
 
-	return reports, nil
+	return rs, nil
 }
 
-func download(downloadPath string, reports []*Report) error {
+func download(downloadPath string, reports []*report) error {
 	for _, report := range reports {
 		fmt.Println(report)
 		tmpDir, dir := "/tmp/"+report.DownloadPath, downloadPath+report.DownloadPath

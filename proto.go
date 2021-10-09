@@ -7,16 +7,16 @@ import (
 
 const downloadURL = "https://pdf.dfcfw.com/pdf/"
 
-type Reports struct {
+type reports struct {
 	Hits      int `json:"hits"`
 	Size      int `json:"size"`
 	TotalPage int `json:"TotalPage"`
 	PageNo    int `json:"pageNo"`
 
-	Data []*Report `json:"data"`
+	Data []*report `json:"data"`
 }
 
-type Report struct {
+type report struct {
 	// Custom
 	DownloadType  string `json:"download_type"`
 	DownloadDate  string `json:"download_date"`
@@ -70,7 +70,7 @@ type Report struct {
 	AttachType            string      `json:"attachType"`
 	AttachSize            int         `json:"attachSize"`
 	AttachPages           int         `json:"attachPages"`
-	EncodeUrl             string      `json:"encodeUrl"`
+	EncodeURL             string      `json:"encodeUrl"`
 	SRatingName           string      `json:"sRatingName"`
 	SRatingCode           string      `json:"sRatingCode"`
 	Market                string      `json:"market"`
@@ -79,11 +79,11 @@ type Report struct {
 	OrgType               string      `json:"orgType"`
 }
 
-func (r *Report) String() string {
+func (r *report) String() string {
 	return fmt.Sprintf("%s %s", r.DownloadName, r.DownloadURL)
 }
 
-func (r *Report) fill(qType string) {
+func (r *report) fill(qType string) {
 	r.DownloadType = qType
 	r.DownloadDate = strings.ReplaceAll(r.PublishDate[:10], "-", "")
 	r.DownloadURL = fmt.Sprintf("%sH3_%s_1.pdf", downloadURL, r.InfoCode)
