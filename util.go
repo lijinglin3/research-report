@@ -55,8 +55,8 @@ func list(qType, beginTime, endTime string, minPages int) ([]*report, error) {
 			if i.AttachPages < minPages {
 				continue
 			}
-			i.fill(qType)
-			rs = append(rs, i)
+
+			rs = append(rs, i.convert(qType))
 		}
 	}
 
@@ -65,8 +65,8 @@ func list(qType, beginTime, endTime string, minPages int) ([]*report, error) {
 
 func download(downloadPath string, reports []*report) error {
 	for _, report := range reports {
-		fmt.Println(report)
-		tmpDir, dir := "/tmp/"+report.DownloadPath, downloadPath+report.DownloadPath
+		fmt.Printf("%s %s%s%s\n", report.URL, downloadPath, report.Path, report.Name)
+		tmpDir, dir := "/tmp/"+report.Path, downloadPath+report.Path
 		if _, err := os.Stat(tmpDir); os.IsNotExist(err) {
 			if err = os.MkdirAll(tmpDir, 0755); err != nil {
 				return err
@@ -77,7 +77,7 @@ func download(downloadPath string, reports []*report) error {
 				return err
 			}
 		}
-		resp, err := http.Get(report.DownloadURL)
+		resp, err := http.Get(report.URL)
 		if err != nil {
 			return err
 		}
@@ -89,10 +89,10 @@ func download(downloadPath string, reports []*report) error {
 		if err != nil {
 			return err
 		}
-		if err = ioutil.WriteFile(tmpDir+report.DownloadName, data, 0644); err != nil {
+		if err = ioutil.WriteFile(tmpDir+report.Name, data, 0644); err != nil {
 			return err
 		}
-		if err = os.Rename(tmpDir+report.DownloadName, dir+report.DownloadName); err != nil {
+		if err = os.Rename(tmpDir+report.Name, dir+report.Name); err != nil {
 			return err
 		}
 	}

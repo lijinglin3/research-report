@@ -1,11 +1,35 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 )
 
 const downloadURL = "https://pdf.dfcfw.com/pdf/"
+
+var errUnknownReportType = errors.New("unknown report type")
+
+type reportType string
+
+const (
+	reportTypeIndividualStock = "0"
+	reportTypeIndustry        = "1"
+	reportTypeMacro           = "2"
+)
+
+func (r reportType) String() string {
+	switch r {
+	case reportTypeIndividualStock:
+		return "个股研报"
+	case reportTypeIndustry:
+		return "行业研报"
+	case reportTypeMacro:
+		return "宏观研究"
+	default:
+		panic(errUnknownReportType)
+	}
+}
 
 type reports struct {
 	Hits      int `json:"hits"`
@@ -13,19 +37,10 @@ type reports struct {
 	TotalPage int `json:"TotalPage"`
 	PageNo    int `json:"pageNo"`
 
-	Data []*report `json:"data"`
+	Data []*rawReport `json:"data"`
 }
 
-type report struct {
-	// Custom
-	DownloadType  string `json:"download_type"`
-	DownloadDate  string `json:"download_date"`
-	DownloadTitle string `json:"download_title"`
-	DownloadPath  string `json:"download_path"`
-	DownloadName  string `json:"download_name"`
-	DownloadURL   string `json:"download_url"`
-
-	// Origin
+type rawReport struct {
 	Title                 string      `json:"title"`
 	StockName             string      `json:"stockName"`
 	StockCode             string      `json:"stockCode"`
@@ -79,29 +94,44 @@ type report struct {
 	OrgType               string      `json:"orgType"`
 }
 
-func (r *report) String() string {
-	return fmt.Sprintf("%s %s", r.DownloadName, r.DownloadURL)
+type report struct {
+	Type      reportType `json:"type"`
+	Date      string     `json:"date"`
+	ShortDate string     `json:"short_date"`
+	Title     string     `json:"title"`
+	Path      string     `json:"path"`
+	Name      string     `json:"name"`
+	URL       string     `json:"url"`
+	Org       string     `json:"org"`
+	Industry  string     `json:"industry"`
+	Stock     string     `json:"stock"`
 }
 
-func (r *report) fill(qType string) {
-	r.DownloadType = qType
-	r.DownloadDate = strings.ReplaceAll(r.PublishDate[:10], "-", "")
-	r.DownloadURL = fmt.Sprintf("%sH3_%s_1.pdf", downloadURL, r.InfoCode)
-	r.DownloadTitle = fixTitle(r.Title)
+func (r *rawReport) convert(qType string) *report {
+	ret := new(report)
+	ret.Type = reportType(qType)
+	ret.Date = r.PublishDate[:10]
+	ret.ShortDate = strings.ReplaceAll(r.PublishDate[:10], "-", "")
+	ret.URL = fmt.Sprintf("%sH3_%s_1.pdf", downloadURL, r.InfoCode)
+	ret.Title = fixTitle(r.Title)
+	ret.Org = r.OrgSName
+	ret.Industry = r.IndvInduName + r.IndustryName
+	ret.Stock = r.StockName
 
 	switch qType {
 	case "0":
-		r.DownloadName = fmt.Sprintf("%s-%s-%s-%s.pdf", r.StockName, r.DownloadDate, r.OrgSName, r.DownloadTitle)
-		r.DownloadPath = fmt.Sprintf("研报/%s/个股研报/%s/", r.DownloadDate[:4], r.IndvInduName)
+		ret.Name = fmt.Sprintf("%s-%s-%s-%s.pdf", ret.Stock, ret.ShortDate, ret.Org, ret.Title)
+		ret.Path = fmt.Sprintf("研报/%s/%s/%s/", ret.ShortDate[:4], ret.Type, ret.Industry)
 	case "1":
-		r.DownloadName = fmt.Sprintf("%s-%s-%s.pdf", r.DownloadDate, r.OrgSName, r.DownloadTitle)
-		r.DownloadPath = fmt.Sprintf("研报/%s/行业研报/%s/", r.DownloadDate[:4], r.IndustryName)
+		ret.Name = fmt.Sprintf("%s-%s-%s.pdf", ret.ShortDate, r.OrgSName, ret.Title)
+		ret.Path = fmt.Sprintf("研报/%s/%s/%s/", ret.ShortDate[:4], ret.Type, ret.Industry)
 	case "2":
-		r.DownloadName = fmt.Sprintf("%s-%s-%s.pdf", r.DownloadDate, r.OrgSName, r.DownloadTitle)
-		r.DownloadPath = fmt.Sprintf("研报/%s/宏观研究/", r.DownloadDate[:4])
+		ret.Name = fmt.Sprintf("%s-%s-%s.pdf", ret.ShortDate, r.OrgSName, ret.Title)
+		ret.Path = fmt.Sprintf("研报/%s/%s/", ret.ShortDate[:4], ret.Type)
 	default:
-		panic("unknown type")
+		panic(errUnknownReportType)
 	}
+	return ret
 }
 
 func fixTitle(title string) string {

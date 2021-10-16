@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"strings"
 	"time"
 
+	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
 )
 
@@ -44,9 +46,35 @@ func runList(_ *cobra.Command, _ []string) {
 		if err != nil {
 			log.Fatalln(err)
 		}
-		for _, i := range items {
-			fmt.Println(i)
+
+		t := table.NewWriter()
+		t.SetOutputMirror(os.Stdout)
+		t.SetStyle(table.StyleRounded)
+		t.SetTitle("%s", table.Row{reportType(qt)})
+		switch qt {
+		case "0":
+			t.AppendHeader(table.Row{"日期", "券商", "行业", "股票", "标题", "链接"})
+			for _, i := range items {
+				t.AppendSeparator()
+				t.AppendRow([]interface{}{i.Date, i.Org, i.Industry, i.Stock, i.Title, i.URL})
+			}
+		case "1":
+			t.AppendHeader(table.Row{"日期", "券商", "行业", "标题", "链接"})
+			for _, i := range items {
+				t.AppendSeparator()
+				t.AppendRow([]interface{}{i.Date, i.Org, i.Industry, i.Title, i.URL})
+			}
+		case "2":
+			t.AppendHeader(table.Row{"日期", "券商", "标题", "链接"})
+			for _, i := range items {
+				t.AppendSeparator()
+				t.AppendRow([]interface{}{i.Date, i.Org, i.Title, i.URL})
+			}
+		default:
+			panic(errUnknownReportType)
 		}
+
+		t.Render()
 	}
 }
 
@@ -64,9 +92,11 @@ func runDownload(_ *cobra.Command, args []string) {
 			log.Fatalln(err)
 		}
 
+		fmt.Printf("开始下载 %s\n", reportType(qt))
 		if err = download(downloadPath, items); err != nil {
 			log.Fatalln(err)
 		}
+		fmt.Println()
 	}
 }
 
