@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 	"strings"
 	"time"
 
@@ -41,6 +42,7 @@ func init() {
 }
 
 func runList(_ *cobra.Command, _ []string) {
+	sort.Sort(sort.Reverse(sort.StringSlice(types)))
 	for _, qt := range types {
 		items, err := list(qt, beginTime, endTime, minPages)
 		if err != nil {
@@ -79,6 +81,7 @@ func runList(_ *cobra.Command, _ []string) {
 }
 
 func runDownload(_ *cobra.Command, args []string) {
+	sort.Sort(sort.Reverse(sort.StringSlice(types)))
 	downloadPath := "./"
 	if len(args) != 0 {
 		downloadPath = args[0]
