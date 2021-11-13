@@ -97,7 +97,8 @@ type rawReport struct {
 type report struct {
 	Type      reportType `json:"type"`
 	Date      string     `json:"date"`
-	ShortDate string     `json:"short_date"`
+	DateShort string     `json:"short_date"`
+	DateMonth string     `json:"date_month"`
 	Title     string     `json:"title"`
 	Path      string     `json:"path"`
 	Name      string     `json:"name"`
@@ -111,25 +112,19 @@ func (r *rawReport) convert(qType string) *report {
 	ret := new(report)
 	ret.Type = reportType(qType)
 	ret.Date = r.PublishDate[:10]
-	ret.ShortDate = strings.ReplaceAll(r.PublishDate[:10], "-", "")
+	ret.DateShort = strings.ReplaceAll(r.PublishDate[:10], "-", "")
 	ret.URL = fmt.Sprintf("%sH3_%s_1.pdf", downloadURL, r.InfoCode)
 	ret.Title = fixTitle(r.Title)
 	ret.Org = r.OrgSName
 	ret.Industry = r.IndvInduName + r.IndustryName
 	ret.Stock = r.StockName
 
-	switch qType {
-	case "0":
-		ret.Name = fmt.Sprintf("%s-%s-%s-%s.pdf", ret.Stock, ret.ShortDate, ret.Org, ret.Title)
-		ret.Path = fmt.Sprintf("研报/%s/%s/%s/", ret.ShortDate[:4], ret.Type, ret.Industry)
-	case "1":
-		ret.Name = fmt.Sprintf("%s-%s-%s.pdf", ret.ShortDate, r.OrgSName, ret.Title)
-		ret.Path = fmt.Sprintf("研报/%s/%s/%s/", ret.ShortDate[:4], ret.Type, ret.Industry)
-	case "2":
-		ret.Name = fmt.Sprintf("%s-%s-%s.pdf", ret.ShortDate, r.OrgSName, ret.Title)
-		ret.Path = fmt.Sprintf("研报/%s/%s/", ret.ShortDate[:4], ret.Type)
-	default:
-		panic(errUnknownReportType)
+	if ret.Stock != "" {
+		ret.Path = fmt.Sprintf("研报/%s/%s/", ret.Type, ret.Stock)
+		ret.Name = fmt.Sprintf("%s-%s-%s-%s.pdf", ret.DateShort, ret.Org, ret.Stock, ret.Title)
+	} else {
+		ret.Path = fmt.Sprintf("研报/%s/%s/", ret.Type, ret.Date[:7])
+		ret.Name = fmt.Sprintf("%s-%s-%s.pdf", ret.DateShort, ret.Org, ret.Title)
 	}
 	return ret
 }

@@ -38,7 +38,7 @@ func init() {
 		"report type, 0: individual stocks, 1: industry, 2: macro")
 	rootCmd.PersistentFlags().StringVarP(&beginTime, "begin", "b", now, "begin time")
 	rootCmd.PersistentFlags().StringVarP(&endTime, "end", "e", now, "end time")
-	rootCmd.PersistentFlags().IntVarP(&minPages, "min-pages", "m", 15, "min pages limit")
+	rootCmd.PersistentFlags().IntVarP(&minPages, "min-pages", "m", 20, "min pages limit")
 }
 
 func runList(_ *cobra.Command, _ []string) {
