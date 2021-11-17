@@ -7,9 +7,9 @@
 ## Usage
 
 ```text
-$ research-report -h
+$ rr-cli -h
 Usage:
-  research-report [command]
+  rr-cli [command]
 
 Available Commands:
   completion  generate the autocompletion script for the specified shell
@@ -18,11 +18,11 @@ Available Commands:
   list        List research reports
 
 Flags:
-  -b, --begin string    begin time (default "2021-10-10")
-  -e, --end string      end time (default "2021-10-10")
-  -h, --help            help for research-report
-  -m, --min-pages int   min pages limit (default 15)
+  -b, --begin string    begin time (default "2021-11-17")
+  -e, --end string      end time (default "2021-11-17")
+  -h, --help            help for rr-cli
+  -m, --min-pages int   min pages limit (default 20)
   -t, --type strings    report type, 0: individual stocks, 1: industry, 2: macro (default [0,1,2])
 
-Use "research-report [command] --help" for more information about a command.
+Use "rr-cli [command] --help" for more information about a command.
 ```
