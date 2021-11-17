@@ -1,4 +1,4 @@
-package main
+package report
 
 import (
 	"encoding/json"
@@ -13,7 +13,8 @@ import (
 
 const dataURL = "http://reportapi.eastmoney.com/report/list"
 
-func list(qType, beginTime, endTime string, minPages int) ([]*report, error) {
+// List reports from dfcfw.cn
+func List(qType, beginTime, endTime string, minPages int) ([]*Report, error) {
 	u, err := url.Parse(dataURL)
 	if err != nil {
 		return nil, err
@@ -26,7 +27,7 @@ func list(qType, beginTime, endTime string, minPages int) ([]*report, error) {
 	q.Add("endTime", endTime)
 
 	curPage, maxPage := 0, 1
-	rs := make([]*report, 0)
+	rs := make([]*Report, 0)
 
 	for curPage <= maxPage {
 		q.Del("pageNo")
@@ -63,7 +64,8 @@ func list(qType, beginTime, endTime string, minPages int) ([]*report, error) {
 	return rs, nil
 }
 
-func download(downloadPath string, reports []*report) error {
+// Download reports from dfcfw.cn
+func Download(downloadPath string, reports []*Report) error {
 	for _, report := range reports {
 		fmt.Printf("%s %s%s%s\n", report.URL, downloadPath, report.Path, report.Name)
 		tmpDir, dir := "/tmp/"+report.Path, downloadPath+report.Path

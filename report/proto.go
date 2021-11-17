@@ -1,4 +1,4 @@
-package main
+package report
 
 import (
 	"errors"
@@ -8,9 +8,11 @@ import (
 
 const downloadURL = "https://pdf.dfcfw.com/pdf/"
 
-var errUnknownReportType = errors.New("unknown report type")
+// ErrUnknownType unknown type error
+var ErrUnknownType = errors.New("unknown report type")
 
-type reportType string
+// Type report type
+type Type string
 
 const (
 	reportTypeIndividualStock = "0"
@@ -18,7 +20,7 @@ const (
 	reportTypeMacro           = "2"
 )
 
-func (r reportType) String() string {
+func (r Type) String() string {
 	switch r {
 	case reportTypeIndividualStock:
 		return "个股研报"
@@ -27,7 +29,7 @@ func (r reportType) String() string {
 	case reportTypeMacro:
 		return "宏观研究"
 	default:
-		panic(errUnknownReportType)
+		panic(ErrUnknownType)
 	}
 }
 
@@ -72,7 +74,7 @@ type rawReport struct {
 	LastEmRatingValue     string      `json:"lastEmRatingValue"`
 	LastEmRatingName      string      `json:"lastEmRatingName"`
 	RatingChange          interface{} `json:"ratingChange"`
-	ReportType            int         `json:"reportType"`
+	ReportType            int         `json:"ReportType"`
 	Author                interface{} `json:"author"`
 	IndvIsNew             string      `json:"indvIsNew"`
 	Researcher            string      `json:"researcher"`
@@ -94,23 +96,24 @@ type rawReport struct {
 	OrgType               string      `json:"orgType"`
 }
 
-type report struct {
-	Type      reportType `json:"type"`
-	Date      string     `json:"date"`
-	DateShort string     `json:"short_date"`
-	DateMonth string     `json:"date_month"`
-	Title     string     `json:"title"`
-	Path      string     `json:"path"`
-	Name      string     `json:"name"`
-	URL       string     `json:"url"`
-	Org       string     `json:"org"`
-	Industry  string     `json:"industry"`
-	Stock     string     `json:"stock"`
+// Report structure
+type Report struct {
+	Type      Type   `json:"type"`
+	Date      string `json:"date"`
+	DateShort string `json:"short_date"`
+	DateMonth string `json:"date_month"`
+	Title     string `json:"title"`
+	Path      string `json:"path"`
+	Name      string `json:"name"`
+	URL       string `json:"url"`
+	Org       string `json:"org"`
+	Industry  string `json:"industry"`
+	Stock     string `json:"stock"`
 }
 
-func (r *rawReport) convert(qType string) *report {
-	ret := new(report)
-	ret.Type = reportType(qType)
+func (r *rawReport) convert(qType string) *Report {
+	ret := new(Report)
+	ret.Type = Type(qType)
 	ret.Date = r.PublishDate[:10]
 	ret.DateShort = strings.ReplaceAll(r.PublishDate[:10], "-", "")
 	ret.URL = fmt.Sprintf("%sH3_%s_1.pdf", downloadURL, r.InfoCode)
