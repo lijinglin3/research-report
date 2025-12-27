@@ -3,7 +3,7 @@ package report
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -37,11 +37,11 @@ func List(qType, beginTime, endTime string, minPages int) ([]*Report, error) {
 		if err != nil {
 			return nil, err
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 		if resp.StatusCode != 200 {
 			log.Fatalln(resp.StatusCode)
 		}
-		body, err := ioutil.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return nil, err
 		}
@@ -70,12 +70,12 @@ func Download(downloadPath string, reports []*Report) error {
 		fmt.Printf("%s %s%s%s\n", report.URL, downloadPath, report.Path, report.Name)
 		tmpDir, dir := "/tmp/"+report.Path, downloadPath+report.Path
 		if _, err := os.Stat(tmpDir); os.IsNotExist(err) {
-			if err = os.MkdirAll(tmpDir, 0755); err != nil {
+			if err = os.MkdirAll(tmpDir, 0o755); err != nil {
 				return err
 			}
 		}
 		if _, err := os.Stat(dir); os.IsNotExist(err) {
-			if err = os.MkdirAll(dir, 0755); err != nil {
+			if err = os.MkdirAll(dir, 0o755); err != nil {
 				return err
 			}
 		}
@@ -86,12 +86,12 @@ func Download(downloadPath string, reports []*Report) error {
 		if resp.StatusCode != 200 {
 			return fmt.Errorf("unexpect code %d", resp.StatusCode)
 		}
-		data, err := ioutil.ReadAll(resp.Body)
+		data, err := io.ReadAll(resp.Body)
 		_ = resp.Body.Close()
 		if err != nil {
 			return err
 		}
-		if err = ioutil.WriteFile(tmpDir+report.Name, data, 0644); err != nil {
+		if err = os.WriteFile(tmpDir+report.Name, data, 0o644); err != nil {
 			return err
 		}
 		if err = os.Rename(tmpDir+report.Name, dir+report.Name); err != nil {

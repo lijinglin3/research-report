@@ -1,6 +1,6 @@
-all: fmt vet golangci-lint golint test
+all: fmt vet golangci-lint test
 
-check: fmt vet golangci-lint golint
+check: fmt vet golangci-lint
 
 fmt:
 	test `go fmt ./... | wc -l` -eq 0
@@ -10,9 +10,6 @@ vet:
 
 golangci-lint:
 	golangci-lint run ./...
-
-golint:
-	test `golint ./... | wc -l` -eq 0
 
 test:
 	go test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
