@@ -1,0 +1,226 @@
+.app-container {
+  min-height: 100vh;
+  background-color: #f5f7fa;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.el-container {
+  background-color: white;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.el-container:hover {
+  box-shadow: none;
+}
+
+.el-main {
+  padding: 0;
+}
+
+/* 搜索表单样式 */
+.search-form {
+  background-color: #f8f9fa;
+  padding: 16px;
+  border-radius: 0;
+  margin-bottom: 0;
+  box-shadow: none;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-form:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.search-form .el-form-item {
+  margin-right: 24px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.search-form .el-select {
+  border-radius: 6px;
+  border: 1px solid #e4e7ed;
+  transition: all 0.3s ease;
+}
+
+.search-form .el-date-picker {
+  width: auto;
+  border-radius: 6px;
+  border: 1px solid #e4e7ed;
+  transition: all 0.3s ease;
+}
+
+.search-form .el-switch {
+  width: auto;
+}
+
+.search-form .el-select:hover,
+.search-form .el-date-picker:hover {
+  border-color: #409eff;
+}
+
+.search-form .el-select:focus-within,
+.search-form .el-date-picker:focus-within {
+  border-color: #409eff;
+  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.1);
+}
+
+/* 表格样式 */
+.el-table {
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: none;
+  transition: all 0.3s ease;
+}
+
+.el-table:hover {
+  box-shadow: none;
+}
+
+.el-table__header-wrapper {
+  background-color: #f5f7fa;
+  padding: 0;
+}
+
+.el-table__header-wrapper th {
+  background-color: #f5f7fa;
+  font-weight: 600;
+  padding: 12px 8px;
+  color: #303133;
+  border-bottom: 2px solid #e4e7ed;
+}
+
+.el-table__body-wrapper tr {
+  transition: all 0.2s ease;
+}
+
+.el-table__body-wrapper tr:hover {
+  background-color: #f0f9ff;
+}
+
+.el-table__body-wrapper tr.el-table__row--striped {
+  background-color: #fafafa;
+}
+
+.el-table__body-wrapper tr.el-table__row--striped:hover {
+  background-color: #f0f9ff;
+}
+
+.el-table__body-wrapper td {
+  padding: 12px 8px;
+  border-bottom: 1px solid #ebeef5;
+}
+
+/* 标题列超链接样式 */
+.report-title-link {
+  color: #409eff;
+  text-decoration: underline;
+  transition: all 0.3s ease;
+}
+
+.report-title-link:hover {
+  color: #66b1ff;
+  text-decoration: underline;
+}
+
+/* 分页组件样式 */
+.pagination-container {
+  text-align: center;
+  margin-top: 16px;
+  padding: 16px 0;
+  background-color: #f8f9fa;
+  border-radius: 0;
+}
+
+.el-pagination {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.el-pagination__total {
+  color: #606266;
+  font-weight: 500;
+}
+
+.el-pagination button {
+  border-radius: 6px;
+  border: 1px solid #dcdfe6;
+  transition: all 0.3s ease;
+}
+
+.el-pagination button:hover {
+  color: #409eff;
+  border-color: #c6e2ff;
+  background-color: #ecf5ff;
+}
+
+.el-pagination .btn-next,
+.el-pagination .btn-prev {
+  background-color: white;
+}
+
+.el-pagination .el-pager li {
+  border-radius: 6px;
+  margin: 0 4px;
+  transition: all 0.3s ease;
+}
+
+.el-pagination .el-pager li:hover {
+  color: #409eff;
+  background-color: #ecf5ff;
+}
+
+.el-pagination .el-pager li.active {
+  color: white;
+  background-color: #409eff;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .app-container {
+    padding: 10px;
+  }
+
+  .el-main {
+    padding: 16px;
+  }
+
+  .search-form {
+    padding: 16px;
+  }
+
+  .search-form .el-form-item {
+    margin-right: 0;
+    width: 100%;
+  }
+
+  .search-form .el-select,
+  .search-form .el-date-picker {
+    width: 100%;
+  }
+}
+
+/* 加载动画 */
+.el-loading-mask {
+  background-color: rgba(255, 255, 255, 0.85);
+}
+
+.el-loading-spinner .path {
+  stroke: #409eff;
+}
+
+/* 消息提示样式 */
+.el-message {
+  min-width: 300px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
