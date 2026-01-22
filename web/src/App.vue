@@ -5,7 +5,7 @@ import './App.css'
 
 // 常量定义
 const API_CONFIG = {
-  BASE_URL: 'http://reportapi.eastmoney.com/report/list2',
+  BASE_URL: 'https://reportapi.eastmoney.com/report/list2',
   BK_API_URL: 'https://reportapi.eastmoney.com/report/bk?bkCode=016'
 }
 
